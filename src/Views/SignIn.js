@@ -3,6 +3,7 @@ import {
   View, TextInput, Text, TouchableOpacity,
   StyleSheet, KeyboardAvoidingView, Alert
 } from 'react-native';
+import firebase from 'react-native-firebase';
 
 class SignIn extends Component {
     constructor(props) {
@@ -12,6 +13,33 @@ class SignIn extends Component {
             password: ''
         };
     }
+     onSignIn() {
+      const {navigation} = this.props;
+      const { email, password } = this.state;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(
+        Alert.alert(
+            'Notice',
+            'Sign up successfully',
+            [
+                { text: 'OK'}
+            ],
+            { cancelable: false }
+        ),
+      
+      )
+      .catch(function(error) {
+        Alert.alert(
+            'Notice',
+            'fail!',
+            [
+                { text: 'OK' }
+            ],
+            { cancelable: false }
+        );
+      });
+    }
+
     render() {
         const { btnText, inputStyle, btnInputStyle, text } = styles;
         const { email, password } = this.state;
@@ -31,7 +59,7 @@ class SignIn extends Component {
                 onChangeText={text => this.setState({ password: text })}
                 secureTextEntry
               />
-              <TouchableOpacity style={btnInputStyle}>
+              <TouchableOpacity style={btnInputStyle} onPress={this.onSignIn.bind(this) } >
                 <Text style={btnText}>SIGN IN NOW</Text>
               </TouchableOpacity>
             </KeyboardAvoidingView>

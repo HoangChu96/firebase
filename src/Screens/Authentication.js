@@ -2,15 +2,32 @@ import React, { Component } from 'react';
 import {
   StyleSheet, Text, View, Image, TouchableOpacity
 } from 'react-native';
-
+import firebase from 'react-native-firebase';
 import SignIn from '../Views/SignIn';
 import SignUp from '../Views/SignUp';
 
 export default class Authentication extends Component {
   constructor(props) {
     super(props);
-    this.state = { isLognIn: true };
+    this.unsubscriber = null;
+    this.state = {
+      user: null,
+      isLognIn: true
+    };
   }
+
+  componentDidMount() {
+    this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {
+      this.setState({ user });
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscriber) {
+      this.unsubscriber();
+    }
+  }
+
   signIn() {
     this.setState({ isLognIn: true });
   }
@@ -32,8 +49,9 @@ export default class Authentication extends Component {
 
     const { isLognIn } = this.state;
 
-    return (
-      <View style={styles.wrapper}>
+    if (!this.state.user) {
+      return(
+        <View style={styles.wrapper}>
         <View style={styles.row1}>
           <View></View>
           <Text style={styles.titleStyle}>User</Text>
@@ -51,6 +69,31 @@ export default class Authentication extends Component {
           </TouchableOpacity>
         </View>
       </View>
+      ) ;
+    }
+
+    return (
+      <View>
+        <Text>Welcome to my awesome app {this.state.user.email}!</Text>
+      </View>
+    //   <View style={styles.wrapper}>
+    //   <View style={styles.row1}>
+    //     <View></View>
+    //     <Text style={styles.titleStyle}>User</Text>
+    //     <View></View>
+    //   </View>
+
+    //   {mainJSX}
+
+    //   <View style={btnContainer}>
+    //     <TouchableOpacity style={btnSignIn} onPress={this.signIn.bind(this)}>
+    //       <Text style={isLognIn ? isSignInStyle : signInStyle}>SIGN IN</Text>
+    //     </TouchableOpacity>
+    //     <TouchableOpacity style={btnSignUp} onPress={this.signUp.bind(this)}>
+    //       <Text style={!isLognIn ? isSignInStyle : signInStyle}>SIGN UP</Text>
+    //     </TouchableOpacity>
+    //   </View>
+    // </View>
     )
   }
 }

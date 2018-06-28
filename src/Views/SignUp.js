@@ -3,6 +3,7 @@ import {
   View, TextInput, Text, TouchableOpacity,
   StyleSheet, Alert, KeyboardAvoidingView
 } from 'react-native';
+import firebase from 'react-native-firebase';
 
 export default class SignUp extends Component {
     constructor(props) {
@@ -14,6 +15,37 @@ export default class SignUp extends Component {
             rePassword: ''
         };
     }
+    //  sử dụng firebase register;
+    registerUser(){
+      firebase.auth().createUserAndRetrieveDataWithEmailAndPassword(this.state.email, this.state.password)
+      .then(
+        this.onSuccess()
+      )
+      .catch(function(error) {
+        this.onFail()
+      });
+    }
+    onSuccess() {
+      Alert.alert(
+          'Notice',
+          'Sign up successfully',
+          [
+              { text: 'OK', onPress: this.props.gotoSignIn() }
+          ],
+          { cancelable: false }
+      );
+  }
+
+  onFail() {
+      Alert.alert(
+          'Notice',
+          'Email has been used by other',
+          [
+              { text: 'OK', onPress: () => this.removeEmail.bind(this) }
+          ],
+          { cancelable: false }
+      );
+  }
 
     render() {
         const { btnText, inputStyle, btnInputStyle, text } = styles;
@@ -46,7 +78,7 @@ export default class SignUp extends Component {
                   secureTextEntry
                   onChangeText={text => this.setState({ rePassword: text })}
                 />
-                <TouchableOpacity style={btnInputStyle}>
+                <TouchableOpacity style={btnInputStyle} onPress={this.registerUser.bind(this)} >
                   <Text style={btnText}>SIGN UP NOW</Text>
                 </TouchableOpacity>
             </KeyboardAvoidingView>
